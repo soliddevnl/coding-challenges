@@ -7,8 +7,28 @@ export async function jq (input: string, args: Set<string>): Promise<string> {
     return /^\.\[\d+]$/.test(arg)
   }
 
-  function isObjectKey (arg: string): boolean {
-    return /^\.\w+$/.test(arg)
+  function filterJson (filter: string, json: any): any {
+    if (isArrayIndex(filter) && json instanceof Array) {
+      const arrayIndex = Number(filter.slice(2, -1))
+      return json[arrayIndex]
+    }
+
+    const objectKey = filter.slice(1)
+
+    let filteredJson = json
+    if (objectKey.includes('.')) {
+      for (const key of objectKey.split('.')) {
+        filteredJson = filterJson(`.${key}`, filteredJson)
+      }
+
+      return filteredJson
+    }
+
+    if (filteredJson instanceof Object && (objectKey in filteredJson)) {
+      return filteredJson[objectKey]
+    }
+
+    return null
   }
 
   if (input?.length > 0) {
@@ -19,16 +39,15 @@ export async function jq (input: string, args: Set<string>): Promise<string> {
 
     const firstArg = args.values().next().value
 
-    if (isArrayIndex(firstArg) && jsonInput instanceof Array) {
-      const arrayIndex = firstArg.slice(2, -1)
-      return prettify(jsonInput[arrayIndex])
+    const filters = firstArg.split(' | ')
+
+    let filteredJson = jsonInput
+    for (const filter of filters) {
+      filteredJson = filterJson(filter, filteredJson)
     }
 
-    if (isObjectKey(firstArg) && jsonInput instanceof Object) {
-      const objectKey = firstArg.slice(1)
-      if (objectKey in jsonInput) {
-        return prettify(jsonInput[objectKey])
-      }
+    if (filteredJson !== null) {
+      return prettify(filteredJson)
     }
   }
 

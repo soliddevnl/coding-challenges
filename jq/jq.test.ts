@@ -97,4 +97,22 @@ describe('jq', function () {
 
     expect(result).toBe(expected)
   })
+
+  it('should support the pipe | operator', async () => {
+    const input = '[{"foo": "bar"}, {"bar": "foo"}]'
+    const expected = '"bar"'
+
+    const result = await jq(input, new Set(['.[0] | .foo']))
+
+    expect(result).toBe(expected)
+  })
+
+  it('should support the pipe | operator with nested object key', async () => {
+    const input = '[{"foo": {"bar": "fuz"}}]'
+    const expected = '"fuz"'
+
+    const result = await jq(input, new Set(['.[0] | .foo.bar']))
+
+    expect(result).toBe(expected)
+  })
 })
