@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { jq } from './jq'
 
 describe('jq', function () {
-  it('should write an empty array when given an empty string', async function () {
+  it('should return null when given an empty string', async function () {
     const result = await jq('', new Set())
 
-    expect(result).toBe('[]')
+    expect(result).toBe('null')
   })
 
   it('should format a simple json string correctly', async () => {
@@ -76,6 +76,24 @@ describe('jq', function () {
     const expected = '11'
 
     const result = await jq(input, new Set(['.[11]']))
+
+    expect(result).toBe(expected)
+  })
+
+  it('should support a object key access \'.foo\'', async () => {
+    const input = '{"foo": "bar"}'
+    const expected = '"bar"'
+
+    const result = await jq(input, new Set(['.foo']))
+
+    expect(result).toBe(expected)
+  })
+
+  it('should return null when given an object key that does not exist', async () => {
+    const input = '{"foo": "bar"}'
+    const expected = 'null'
+
+    const result = await jq(input, new Set(['.bar']))
 
     expect(result).toBe(expected)
   })

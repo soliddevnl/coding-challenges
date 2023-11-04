@@ -7,6 +7,10 @@ export async function jq (input: string, args: Set<string>): Promise<string> {
     return /^\.\[\d+]$/.test(arg)
   }
 
+  function isObjectKey (arg: string): boolean {
+    return /^\.\w+$/.test(arg)
+  }
+
   if (input?.length > 0) {
     const jsonInput = JSON.parse(input)
     if (args.size === 0 || args.has('.')) {
@@ -14,13 +18,21 @@ export async function jq (input: string, args: Set<string>): Promise<string> {
     }
 
     const firstArg = args.values().next().value
-    const firstArgValue = firstArg.slice(2, -1)
+
     if (isArrayIndex(firstArg) && jsonInput instanceof Array) {
-      return prettify(jsonInput[firstArgValue])
+      const arrayIndex = firstArg.slice(2, -1)
+      return prettify(jsonInput[arrayIndex])
+    }
+
+    if (isObjectKey(firstArg) && jsonInput instanceof Object) {
+      const objectKey = firstArg.slice(1)
+      if (objectKey in jsonInput) {
+        return prettify(jsonInput[objectKey])
+      }
     }
   }
 
-  return '[]'
+  return 'null'
 }
 
 async function readInput (): Promise<string> {
