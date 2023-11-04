@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { jq, main } from './jq'
+import { jq } from './jq'
 
 describe('jq', function () {
   it('should write an empty array when given an empty string', async function () {
