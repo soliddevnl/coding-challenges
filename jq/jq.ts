@@ -1,15 +1,22 @@
 export async function jq (input: string, args: Set<string>): Promise<string> {
-  function prettify (json: string): string {
-    return JSON.stringify(JSON.parse(json), null, 2)
+  function prettify (json: any): string {
+    return JSON.stringify(json, null, 2)
+  }
+
+  function isArrayIndex (arg: string): boolean {
+    return /^\.\[\d+]$/.test(arg)
   }
 
   if (input?.length > 0) {
     const jsonInput = JSON.parse(input)
     if (args.size === 0 || args.has('.')) {
-      return prettify(JSON.stringify(jsonInput))
+      return prettify(jsonInput)
     }
-    if (args.has('.[0]')) {
-      return prettify(JSON.stringify(jsonInput[0]))
+
+    const firstArg = args.values().next().value
+    const firstArgValue = firstArg.slice(2, -1)
+    if (isArrayIndex(firstArg) && jsonInput instanceof Array) {
+      return prettify(jsonInput[firstArgValue])
     }
   }
 

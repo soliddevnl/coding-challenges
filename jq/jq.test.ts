@@ -54,12 +54,28 @@ describe('jq', function () {
   })
 
   it('should support array index access \'.[0]\'', async () => {
-    const input = '[{"foo": "bar"}]'
-    const expected = `{
-  "foo": "bar"
-}`
+    const input = '[0]'
+    const expected = '0'
 
     const result = await jq(input, new Set(['.[0]']))
+
+    expect(result).toBe(expected)
+  })
+
+  it('should support array index access \'.[1]\'', async () => {
+    const input = '[0,1]'
+    const expected = '1'
+
+    const result = await jq(input, new Set(['.[1]']))
+
+    expect(result).toBe(expected)
+  })
+
+  it('should support array index access \'.[11]\'', async () => {
+    const input = '[0,1,2,3,4,5,6,7,8,9,10,11]'
+    const expected = '11'
+
+    const result = await jq(input, new Set(['.[11]']))
 
     expect(result).toBe(expected)
   })
