@@ -8,7 +8,7 @@ export async function jq (input: string, args: Set<string>): Promise<string> {
     if (args.size === 0 || args.has('.')) {
       return prettify(JSON.stringify(jsonInput))
     }
-    if (args.has('.0')) {
+    if (args.has('.[0]')) {
       return prettify(JSON.stringify(jsonInput[0]))
     }
   }

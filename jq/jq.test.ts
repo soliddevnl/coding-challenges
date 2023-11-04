@@ -53,13 +53,13 @@ describe('jq', function () {
     expect(result).toBe(expected)
   })
 
-  it('should support array index access', async () => {
+  it('should support array index access \'.[0]\'', async () => {
     const input = '[{"foo": "bar"}]'
     const expected = `{
   "foo": "bar"
 }`
 
-    const result = await jq(input, new Set(['.0']))
+    const result = await jq(input, new Set(['.[0]']))
 
     expect(result).toBe(expected)
   })
