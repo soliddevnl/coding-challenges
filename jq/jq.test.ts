@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { jq } from './jq'
+import { as } from 'vitest/dist/reporters-5f784f42'
 
 describe('jq', function () {
   it('should return null when given an empty string', async function () {
@@ -89,6 +90,15 @@ describe('jq', function () {
     expect(result).toBe(expected)
   })
 
+  it('should support a object key access like .["foo"]', async () => {
+    const input = '{"foo": "bar"}'
+    const expected = '"bar"'
+
+    const result = await jq(input, '.["foo"]')
+
+    expect(result).toBe(expected)
+  })
+
   it('should return null when given an object key that does not exist', async () => {
     const input = '{"foo": "bar"}'
     const expected = 'null'
@@ -96,6 +106,12 @@ describe('jq', function () {
     const result = await jq(input, '.bar')
 
     expect(result).toBe(expected)
+  })
+
+  it('should throw an error when using an object key on a non-object', async () => {
+    const input = 'null'
+
+    await expect(jq(input, '.foo')).rejects.toThrow('Input must be an object')
   })
 
   it('should support the pipe | operator', async () => {
