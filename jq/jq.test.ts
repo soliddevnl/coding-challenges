@@ -3,13 +3,13 @@ import { jq } from './jq'
 
 describe('jq', function () {
   it('should return null when given an empty string', async function () {
-    const result = await jq('', new Set())
+    const result = await jq('', '')
 
     expect(result).toBe('null')
   })
 
   it('should format a simple json string correctly', async () => {
-    const result = await jq('{"foo": "bar"}', new Set())
+    const result = await jq('{"foo": "bar"}', '.')
 
     expect(result).toBe(`{
   "foo": "bar"
@@ -37,7 +37,7 @@ describe('jq', function () {
   "limit": 2
 }`
 
-    const result = await jq(input, new Set())
+    const result = await jq(input, '')
 
     expect(result).toBe(expected)
   })
@@ -48,7 +48,7 @@ describe('jq', function () {
   "foo": "bar"
 }`
 
-    const result = await jq(input, new Set(['.']))
+    const result = await jq(input, '.')
 
     expect(result).toBe(expected)
   })
@@ -57,7 +57,7 @@ describe('jq', function () {
     const input = '[0]'
     const expected = '0'
 
-    const result = await jq(input, new Set(['.[0]']))
+    const result = await jq(input, '.[0]')
 
     expect(result).toBe(expected)
   })
@@ -66,7 +66,7 @@ describe('jq', function () {
     const input = '[0,1]'
     const expected = '1'
 
-    const result = await jq(input, new Set(['.[1]']))
+    const result = await jq(input, '.[1]')
 
     expect(result).toBe(expected)
   })
@@ -75,7 +75,7 @@ describe('jq', function () {
     const input = '[0,1,2,3,4,5,6,7,8,9,10,11]'
     const expected = '11'
 
-    const result = await jq(input, new Set(['.[11]']))
+    const result = await jq(input, '.[11]')
 
     expect(result).toBe(expected)
   })
@@ -84,7 +84,7 @@ describe('jq', function () {
     const input = '{"foo": "bar"}'
     const expected = '"bar"'
 
-    const result = await jq(input, new Set(['.foo']))
+    const result = await jq(input, '.foo')
 
     expect(result).toBe(expected)
   })
@@ -93,7 +93,7 @@ describe('jq', function () {
     const input = '{"foo": "bar"}'
     const expected = 'null'
 
-    const result = await jq(input, new Set(['.bar']))
+    const result = await jq(input, '.bar')
 
     expect(result).toBe(expected)
   })
@@ -102,7 +102,7 @@ describe('jq', function () {
     const input = '[{"foo": "bar"}, {"bar": "foo"}]'
     const expected = '"bar"'
 
-    const result = await jq(input, new Set(['.[0] | .foo']))
+    const result = await jq(input, '.[0] | .foo')
 
     expect(result).toBe(expected)
   })
@@ -111,7 +111,7 @@ describe('jq', function () {
     const input = '[{"foo": {"bar": "fuz"}}]'
     const expected = '"fuz"'
 
-    const result = await jq(input, new Set(['.[0] | .foo.bar']))
+    const result = await jq(input, '.[0] | .foo.bar')
 
     expect(result).toBe(expected)
   })

@@ -1,4 +1,4 @@
-export async function jq (input: string, args: Set<string>): Promise<string> {
+export async function jq (input: string, filter: string): Promise<string> {
   function prettify (json: any): string {
     return JSON.stringify(json, null, 2)
   }
@@ -33,13 +33,11 @@ export async function jq (input: string, args: Set<string>): Promise<string> {
 
   if (input?.length > 0) {
     const jsonInput = JSON.parse(input)
-    if (args.size === 0 || args.has('.')) {
+    if (filter.length === 0 || filter === '.') {
       return prettify(jsonInput)
     }
 
-    const firstArg = args.values().next().value
-
-    const filters = firstArg.split(' | ')
+    const filters = filter.split(' | ')
 
     let filteredJson = jsonInput
     for (const filter of filters) {
@@ -68,9 +66,8 @@ async function readInput (): Promise<string> {
 }
 
 export async function main (): Promise<string> {
-  const args = new Set(process.argv.slice(2))
   const input = await readInput()
-  const result = await jq(input, args)
+  const result = await jq(input, process.argv[2])
   process.stdout.write(result)
   return result
 }
