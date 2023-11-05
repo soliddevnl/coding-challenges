@@ -139,4 +139,15 @@ describe('jq', function () {
 
     expect(result).toBe(expected)
   })
+
+  it('should support array construction', async () => {
+    const input = '{"foo": "bar"}'
+    const expected = `[
+  "bar"
+]`
+
+    const result = await jq(input, '[.foo]')
+
+    expect(result).toBe(expected)
+  })
 })
