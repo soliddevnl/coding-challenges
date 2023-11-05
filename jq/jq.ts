@@ -1,34 +1,19 @@
+import { parseFilter } from './filters'
+
 export async function jq (input: string, filter: string): Promise<string> {
   function prettify (json: any): string {
     return JSON.stringify(json, null, 2)
   }
 
-  function isArrayIndex (arg: string): boolean {
-    return /^\.\[\d+]$/.test(arg)
-  }
-
   function filterJson (filter: string, json: any): any {
-    if (isArrayIndex(filter) && json instanceof Array) {
-      const arrayIndex = Number(filter.slice(2, -1))
-      return json[arrayIndex]
-    }
-
-    const objectKey = filter.slice(1)
+    const filterOperations = parseFilter(filter)
 
     let filteredJson = json
-    if (objectKey.includes('.')) {
-      for (const key of objectKey.split('.')) {
-        filteredJson = filterJson(`.${key}`, filteredJson)
-      }
-
-      return filteredJson
+    for (const filterOperation of filterOperations) {
+      filteredJson = filterOperation.filter(filter, filteredJson)
     }
 
-    if (filteredJson instanceof Object && (objectKey in filteredJson)) {
-      return filteredJson[objectKey]
-    }
-
-    return null
+    return filteredJson
   }
 
   if (input?.length > 0) {
