@@ -15,6 +15,11 @@ interface ObjectKeyOperation extends FilterOperation {
 type Operation = ArrayIndexOperation | ObjectKeyOperation
 
 export function parseFilter (filter: string): Operation[] {
+  if (filter.includes(' | ')) {
+    const filters = filter.split(' | ')
+    return filters.map((filter) => parseFilter(filter)).flat()
+  }
+
   const isArrayIndexFilter = /^\.\[\d+]$/.test(filter)
   if (isArrayIndexFilter) {
     const arrayIndex = Number(filter.slice(2, -1))

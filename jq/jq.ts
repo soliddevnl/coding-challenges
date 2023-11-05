@@ -22,13 +22,7 @@ export async function jq (input: string, filter: string): Promise<string> {
       return prettify(jsonInput)
     }
 
-    const filters = filter.split(' | ')
-
-    let filteredJson = jsonInput
-    for (const filter of filters) {
-      filteredJson = filterJson(filter, filteredJson)
-    }
-
+    const filteredJson = filterJson(filter, jsonInput)
     if (filteredJson !== null) {
       return prettify(filteredJson)
     }
