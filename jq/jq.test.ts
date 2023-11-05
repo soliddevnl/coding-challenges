@@ -114,6 +114,14 @@ describe('jq', function () {
     await expect(jq(input, '.foo')).rejects.toThrow('Input must be an object')
   })
 
+  it('should not throw an error when using an optional object key on a non-object', async () => {
+    const input = 'null'
+
+    const result = await jq(input, '.foo?')
+
+    expect(result).toBe('null')
+  })
+
   it('should support the pipe | operator', async () => {
     const input = '[{"foo": "bar"}, {"bar": "foo"}]'
     const expected = '"bar"'
