@@ -6,14 +6,7 @@ export async function jq (input: string, filter: string): Promise<string> {
   }
 
   function filterJson (filter: string, json: any): any {
-    const filterOperations = parseFilter(filter)
-
-    let filteredJson = json
-    for (const filterOperation of filterOperations) {
-      filteredJson = filterOperation.filter(filter, filteredJson)
-    }
-
-    return filteredJson
+    return parseFilter(filter).filter(json)
   }
 
   if (input?.length > 0) {

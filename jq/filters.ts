@@ -1,48 +1,83 @@
-interface FilterOperation {
-  filter: (filter: string, json: any) => any
+abstract class Filter {
+  filter (input: any): any {
+    return []
+  }
 }
 
-interface ArrayIndexOperation extends FilterOperation {
-  type: 'arrayIndex'
-  index: number
+class ArrayIndexFilter extends Filter {
+  constructor (private readonly index: number) {
+    super()
+  }
+
+  filter (array: unknown[]): any {
+    return array[this.index]
+  }
 }
 
-interface ObjectKeyOperation extends FilterOperation {
-  type: 'objectKey'
-  key: string
+class ObjectKeyFilter extends Filter {
+  constructor (private readonly key: string) {
+    super()
+  }
+
+  filter (input: Record<string, unknown>): any {
+    if (!Object.keys(input).includes(this.key)) {
+      return null
+    }
+    return input[this.key]
+  }
 }
 
-type Operation = ArrayIndexOperation | ObjectKeyOperation
+class PipeFilter extends Filter {
+  constructor (private readonly filterOne: Filter, private readonly filterTwo: Filter) {
+    super()
+  }
 
-export function parseFilter (filter: string): Operation[] {
+  filter (input: any): any {
+    const outputFilterOne = this.filterOne.filter(input)
+    if (outputFilterOne === null) {
+      return null
+    }
+    return this.filterTwo.filter(outputFilterOne)
+  }
+}
+
+class CompoundFilter extends Filter {
+  constructor (private readonly filters: Filter[]) {
+    super()
+  }
+
+  filter (input: any): any {
+    let filteredInput = input
+    for (const filter of this.filters) {
+      filteredInput = filter.filter(filteredInput)
+      if (filteredInput === null) {
+        return filteredInput
+      }
+    }
+    return filteredInput
+  }
+}
+
+export function parseFilter (filter: string): Filter {
   if (filter.includes(' | ')) {
     const filters = filter.split(' | ')
-    return filters.map((filter) => parseFilter(filter)).flat()
+    return new PipeFilter(
+      parseFilter(filters[0]),
+      parseFilter(filters[1])
+    )
   }
 
   const isArrayIndexFilter = /^\.\[\d+]$/.test(filter)
   if (isArrayIndexFilter) {
     const arrayIndex = Number(filter.slice(2, -1))
-    return [{
-      type: 'arrayIndex',
-      index: arrayIndex,
-      filter: (filter, json) => {
-        if (Array.isArray(json)) {
-          return json[arrayIndex]
-        }
-
-        return null
-      }
-    }]
+    return new ArrayIndexFilter(arrayIndex)
   }
 
-  const objectKey = filter.slice(1)
+  if (!filter.includes('.')) {
+    return new ObjectKeyFilter(filter)
+  }
 
-  return objectKey.split('.').map((key) => ({
-    type: 'objectKey',
-    key,
-    filter: (filter, json) => {
-      return json[key] ?? null
-    }
-  }))
+  return new CompoundFilter(
+    filter.slice(1).split('.').map((filter) => parseFilter(filter))
+  )
 }
