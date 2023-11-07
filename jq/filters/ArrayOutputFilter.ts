@@ -6,6 +6,10 @@ export class ArrayOutputFilter extends Filter {
   }
 
   filter (input: any): any {
-    return [this.outputFilter.filter(input)]
+    const output = this.outputFilter.filter(input)
+    if (Array.isArray(output)) {
+      return output
+    }
+    return [output]
   }
 }

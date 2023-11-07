@@ -161,4 +161,16 @@ describe('jq', function () {
 
     expect(result).toBe(expected)
   })
+
+  it('should not output an array when the output is already an array', async () => {
+    const input = '[1,2]'
+    const expected = `[
+  1,
+  2
+]`
+
+    const result = await jq(input, '[.]')
+
+    expect(result).toBe(expected)
+  })
 })
