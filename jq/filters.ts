@@ -40,6 +40,13 @@ export function parseFilter (filter: string): Filter {
     )
   }
 
+  if (filter.includes('[') && filter.includes(']')) {
+    return new PipeFilter(
+      new ObjectKeyFilter(filter.slice(1, filter.indexOf('['))),
+      parseFilter(filter.slice(filter.indexOf('[')))
+    )
+  }
+
   if (filter.includes('.')) {
     return new CompoundFilter(
       filter.slice(1).split('.').map((filter) => parseFilter(filter))

@@ -173,4 +173,17 @@ describe('jq', function () {
 
     expect(result).toBe(expected)
   })
+
+  it('should support the array index filter with .foo[0]', async () => {
+    const input = '{"foo":[{"bar": 1}, {"bar": 2}]}'
+    const expected = `[
+  {
+    "bar": 1
+  }
+]`
+
+    const result = await jq(input, '.foo[0]')
+
+    expect(result).toBe(expected)
+  })
 })
