@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import { jq } from './jq'
-import { as } from 'vitest/dist/reporters-5f784f42'
 
 describe('jq', function () {
   it('should return null when given an empty string', async function () {
@@ -38,7 +37,7 @@ describe('jq', function () {
   "limit": 2
 }`
 
-    const result = await jq(input, '')
+    const result = await jq(input)
 
     expect(result).toBe(expected)
   })

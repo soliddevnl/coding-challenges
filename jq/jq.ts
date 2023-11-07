@@ -1,6 +1,6 @@
 import { parseFilter } from './filters'
 
-export async function jq (input: string, filter: string): Promise<string> {
+export async function jq (input: string, filter: string = '.'): Promise<string> {
   function prettify (json: any): string {
     return JSON.stringify(json, null, 2)
   }
@@ -11,17 +11,10 @@ export async function jq (input: string, filter: string): Promise<string> {
 
   if (input?.length > 0) {
     const jsonInput = JSON.parse(input)
-    if (filter.length === 0 || filter === '.') {
-      return prettify(jsonInput)
-    }
-
-    const filteredJson = filterJson(filter, jsonInput)
-    if (filteredJson !== null) {
-      return prettify(filteredJson)
-    }
+    return prettify(filterJson(filter, jsonInput))
   }
 
-  return 'null'
+  return prettify(null)
 }
 
 async function readInput (): Promise<string> {

@@ -4,8 +4,13 @@ import { ArrayIndexFilter } from './filters/ArrayIndexFilter'
 import { ObjectKeyFilter } from './filters/ObjectKeyFilter'
 import { CompoundFilter } from './filters/CompoundFilter'
 import { ArrayOutputFilter } from './filters/ArrayOutputFilter'
+import { IdentityFilter } from './filters/IdentityFilter'
 
 export function parseFilter (filter: string): Filter {
+  if (filter === '.') {
+    return new IdentityFilter()
+  }
+
   if (filter.startsWith('[') && filter.endsWith(']')) {
     return new ArrayOutputFilter(parseFilter(filter.slice(1, -1)))
   }
