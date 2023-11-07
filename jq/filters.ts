@@ -11,7 +11,11 @@ export function parseFilter (filter: string): Filter {
   }
 
   if (filter.startsWith('.[') && filter.endsWith(']')) {
-    return new ObjectKeyFilter(filter.slice(2, -1))
+    const filterIndex = filter.slice(2, -1)
+    if (isNaN(Number(filterIndex))) {
+      return new ObjectKeyFilter(filterIndex)
+    }
+    return new ArrayIndexFilter(Number(filterIndex))
   }
 
   if (filter.includes(' | ')) {
@@ -22,17 +26,11 @@ export function parseFilter (filter: string): Filter {
     )
   }
 
-  const isArrayIndexFilter = /^\.\[\d+]$/.test(filter)
-  if (isArrayIndexFilter) {
-    const arrayIndex = Number(filter.slice(2, -1))
-    return new ArrayIndexFilter(arrayIndex)
+  if (filter.includes('.')) {
+    return new CompoundFilter(
+      filter.slice(1).split('.').map((filter) => parseFilter(filter))
+    )
   }
 
-  if (!filter.includes('.')) {
-    return new ObjectKeyFilter(filter)
-  }
-
-  return new CompoundFilter(
-    filter.slice(1).split('.').map((filter) => parseFilter(filter))
-  )
+  return new ObjectKeyFilter(filter)
 }

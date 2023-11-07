@@ -81,7 +81,7 @@ describe('jq', function () {
     expect(result).toBe(expected)
   })
 
-  it('should support a object key access \'.foo\'', async () => {
+  it('should support a object key access ".foo"', async () => {
     const input = '{"foo": "bar"}'
     const expected = '"bar"'
 
