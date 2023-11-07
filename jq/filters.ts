@@ -3,8 +3,17 @@ import { type Filter } from './filters/Filter'
 import { ArrayIndexFilter } from './filters/ArrayIndexFilter'
 import { ObjectKeyFilter } from './filters/ObjectKeyFilter'
 import { CompoundFilter } from './filters/CompoundFilter'
+import { ArrayOutputFilter } from './filters/ArrayOutputFilter'
 
 export function parseFilter (filter: string): Filter {
+  if (filter.startsWith('[') && filter.endsWith(']')) {
+    return new ArrayOutputFilter(parseFilter(filter.slice(1, -1)))
+  }
+
+  if (filter.startsWith('.[') && filter.endsWith(']')) {
+    return new ObjectKeyFilter(filter.slice(2, -1))
+  }
+
   if (filter.includes(' | ')) {
     const filters = filter.split(' | ')
     return new PipeFilter(

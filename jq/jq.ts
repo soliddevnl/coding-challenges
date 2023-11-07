@@ -6,10 +6,6 @@ export async function jq (input: string, filter: string): Promise<string> {
   }
 
   function filterJson (filter: string, json: any): any {
-    if (filter.startsWith('[') && filter.endsWith(']')) {
-      return [parseFilter(filter.slice(1, -1)).filter(json)]
-    }
-
     return parseFilter(filter).filter(json)
   }
 
